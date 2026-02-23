@@ -44,6 +44,10 @@ sudo cmake --install build
 - 神
 - バックアップを取らなかった技術者達
 
+ユーザー製作:
+
+- [otoneko1102/amazing-compression-tech](https://github.com/otoneko1102/amazing-compression-tech)
+
 ## license
 
 このプロジェクトはMITライセンスの元で公開されています。詳細については [LICENSE](LICENSE) ファイルをご覧ください。

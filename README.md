@@ -44,6 +44,10 @@ sudo cmake --install build
 - God
 - Engineers who didn't back up their data
 
+Users' Creations:
+
+- [otoneko1102/amazing-compression-tech](https://github.com/otoneko1102/amazing-compression-tech)
+
 ## license
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
