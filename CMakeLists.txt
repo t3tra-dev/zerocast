@@ -1,0 +1,104 @@
+cmake_minimum_required(VERSION 3.16)
+
+project(zerocast LANGUAGES C)
+
+include(GNUInstallDirs)
+
+set(CMAKE_C_STANDARD 17)
+set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+	if(WIN32)
+		set(CMAKE_INSTALL_PREFIX "C:/Program Files/${PROJECT_NAME}" CACHE PATH "Install path prefix" FORCE)
+	elseif(APPLE)
+		set(CMAKE_INSTALL_PREFIX "/usr/local" CACHE PATH "Install path prefix" FORCE)
+	elseif(UNIX)
+		set(CMAKE_INSTALL_PREFIX "/usr/local" CACHE PATH "Install path prefix" FORCE)
+	endif()
+endif()
+
+if(WIN32)
+	set(ZEROCAST_RUNTIME_INSTALL_DIR "bin")
+	set(ZEROCAST_LIBRARY_INSTALL_DIR "bin")
+	set(ZEROCAST_ARCHIVE_INSTALL_DIR "lib")
+	set(ZEROCAST_HEADER_INSTALL_DIR "include")
+	set(ZEROCAST_INSTALL_RPATH "")
+elseif(APPLE)
+	set(ZEROCAST_RUNTIME_INSTALL_DIR "${CMAKE_INSTALL_BINDIR}")
+	set(ZEROCAST_LIBRARY_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}")
+	set(ZEROCAST_ARCHIVE_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}")
+	set(ZEROCAST_HEADER_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}")
+	set(ZEROCAST_INSTALL_RPATH "@loader_path/../${CMAKE_INSTALL_LIBDIR}")
+elseif(UNIX)
+	set(ZEROCAST_RUNTIME_INSTALL_DIR "${CMAKE_INSTALL_BINDIR}")
+	set(ZEROCAST_LIBRARY_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}")
+	set(ZEROCAST_ARCHIVE_INSTALL_DIR "${CMAKE_INSTALL_LIBDIR}")
+	set(ZEROCAST_HEADER_INSTALL_DIR "${CMAKE_INSTALL_INCLUDEDIR}")
+	set(ZEROCAST_INSTALL_RPATH "$ORIGIN/../${CMAKE_INSTALL_LIBDIR}")
+endif()
+
+file(STRINGS src/main.c ZEROCAST_VERSION_LINE
+	REGEX "^#define[ \t]+ZEROCAST_VERSION[ \t]+\"[0-9]+\\.[0-9]+\\.[0-9]+\""
+)
+
+if(NOT ZEROCAST_VERSION_LINE)
+	message(FATAL_ERROR "Failed to read ZEROCAST_VERSION from src/main.c")
+endif()
+
+string(REGEX REPLACE
+	"^#define[ \t]+ZEROCAST_VERSION[ \t]+\"([0-9]+\\.[0-9]+\\.[0-9]+)\".*$"
+	"\\1"
+	ZEROCAST_VERSION
+	"${ZEROCAST_VERSION_LINE}"
+)
+
+string(REGEX REPLACE "^([0-9]+)\\..*$" "\\1" ZEROCAST_SOVERSION
+	"${ZEROCAST_VERSION}"
+)
+
+add_library(zerocast_lib SHARED
+	src/compress.c
+	src/decompress.c
+)
+
+set_target_properties(zerocast_lib PROPERTIES
+	OUTPUT_NAME zerocast
+	VERSION ${ZEROCAST_VERSION}
+	SOVERSION ${ZEROCAST_SOVERSION}
+)
+
+if(APPLE)
+	set_target_properties(zerocast_lib PROPERTIES
+		MACHO_CURRENT_VERSION ${ZEROCAST_VERSION}
+		MACHO_COMPATIBILITY_VERSION ${ZEROCAST_VERSION}
+	)
+endif()
+
+target_include_directories(zerocast_lib PUBLIC src)
+
+target_compile_definitions(zerocast_lib PRIVATE ZEROCAST_EXPORTS)
+
+add_executable(zerocast
+	src/main.c
+	src/argparse.c
+	src/reader.c
+)
+
+target_include_directories(zerocast PRIVATE src)
+
+target_link_libraries(zerocast PRIVATE zerocast_lib)
+
+set_target_properties(zerocast PROPERTIES
+	INSTALL_RPATH "${ZEROCAST_INSTALL_RPATH}"
+)
+
+install(TARGETS zerocast zerocast_lib
+	RUNTIME DESTINATION ${ZEROCAST_RUNTIME_INSTALL_DIR}
+	LIBRARY DESTINATION ${ZEROCAST_LIBRARY_INSTALL_DIR}
+	ARCHIVE DESTINATION ${ZEROCAST_ARCHIVE_INSTALL_DIR}
+)
+
+install(FILES src/zerocast.h DESTINATION ${ZEROCAST_HEADER_INSTALL_DIR})
