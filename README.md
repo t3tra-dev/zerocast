@@ -26,6 +26,22 @@ zerocast decompress <input_path> [output_path]
 zerocast version
 ```
 
+Also, the `zerocast_compress` and `zerocast_decompress` functions of zerocast are available from `zerocast.h` using the `libzerocast` C library.
+
+Their signatures are as follows:
+
+```c
+ZEROCAST_API size_t zerocast_compress(const unsigned char *input_data,
+                                      size_t input_size,
+                                      unsigned char **out_data);
+
+ZEROCAST_API int zerocast_decompress(const unsigned char *input_data,
+                                     size_t input_size,
+                                     unsigned char **out_data,
+                                     size_t *out_size,
+                                     FILE *error_stream);
+```
+
 ## build & install
 
 The `zerocast` CLI can be built and installed using the following methods:

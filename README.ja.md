@@ -26,6 +26,22 @@ zerocast decompress <input_path> [output_path]
 zerocast version
 ```
 
+また、`libzerocast` C ライブラリを用いて zerocast の `zerocast_compress` 関数と `zerocast_decompress` 関数が `zerocast.h` から利用可能です。
+
+各シグネチャは以下の通りです:
+
+```c
+ZEROCAST_API size_t zerocast_compress(const unsigned char *input_data,
+                                      size_t input_size,
+                                      unsigned char **out_data);
+
+ZEROCAST_API int zerocast_decompress(const unsigned char *input_data,
+                                     size_t input_size,
+                                     unsigned char **out_data,
+                                     size_t *out_size,
+                                     FILE *error_stream);
+```
+
 ## build & install
 
 `zerocast` CLI は以下の方法でビルド・インストールできます:
