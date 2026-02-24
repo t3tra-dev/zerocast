@@ -54,7 +54,23 @@ cmake -S . -B build && cmake --build build
 sudo cmake --install build
 ```
 
-## related works
+## run with Docker
+
+You can run the `zerocast` CLI with Docker as follows:
+
+```sh
+docker compose run --remove-orphans zerocast
+```
+
+Try compressing `README.md`:
+
+```sh
+docker compose run --remove-orphans zerocast zerocast compress README.md
+```
+
+It will blow your mind! (and the data too)
+
+# related works
 
 - Infinite Monkey Theorem
 - God
