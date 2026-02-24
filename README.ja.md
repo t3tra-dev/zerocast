@@ -54,6 +54,22 @@ cmake -S . -B build && cmake --build build
 sudo cmake --install build
 ```
 
+## run with Docker
+
+Docker を使って以下のコマンドでも起動できます:
+
+```sh
+docker compose run --remove-orphans zerocast
+```
+
+以下のコマンドで `README.md` を圧縮できます:
+
+```sh
+docker compose run --remove-orphans zerocast zerocast compress README.md
+```
+
+圧縮後は `README.md_out` に保存されます。
+
 ## related works
 
 - 無限の猿定理

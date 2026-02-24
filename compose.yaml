@@ -1,0 +1,16 @@
+services:
+  zerocast:
+    build:
+      dockerfile_inline: |
+        FROM alpine:latest
+        RUN apk update && apk add alpine-sdk cmake
+        WORKDIR /app
+        COPY . .
+        RUN cmake -S . -B build && cmake --build build
+
+        FROM alpine:latest
+        COPY --from=0 /app/build/zerocast /usr/local/bin/
+        COPY --from=0 /app/build/libzerocast* /usr/local/lib/
+        WORKDIR /app
+    volumes:
+      - .:/app
